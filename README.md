@@ -58,6 +58,8 @@ INSERT INTO faq (question, answer) VALUES
 
 note : you can change the FAQ on the list, according to your liking
 
+<< Don't forget to change your credentials on the app.py and config.py (password for database, API, language model, etc) >>
+
 4. Run these python app to embed the datas and generate and save FAISS index
 
 python embed_products.py
