@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot AI</title>
+    <style>
+        #chat-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+            font-family: sans-serif;
+        }
+        .user { color: blue; margin-bottom: 5px; }
+        .bot { color: green; margin-bottom: 10px; }
+    </style>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <h2>Ask the Chatbot</h2>
+
+    <div id="chat-box">
+        {% for chat in history %}
+            <div class="user"><strong>You:</strong> {{ chat[0] }}</div>
+            <div class="bot"><strong>Bot:</strong> {{ chat[1] }}</div>
+        {% endfor %}
+    </div>
+
+    <input type="text" id="user-input" placeholder="Type your message here..." autofocus>
+    <button onclick="sendMessage()">Send</button>
+
+<script>
+    function sendMessage() {
+        const input = document.getElementById('user-input');
+        const message = input.value.trim();
+        if (!message) return;
+
+        fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        })
+        .then(res => res.json())
+        .then(data => {
+            const box = document.getElementById("chat-box");
+
+            // Create chat entry and convert bot response from Markdown to HTML
+            const userDiv = document.createElement("div");
+            userDiv.className = "user";
+            userDiv.innerHTML = `<strong>You:</strong> ${message}`;
+
+            const botDiv = document.createElement("div");
+            botDiv.className = "bot";
+            botDiv.innerHTML = `<strong>Bot:</strong> ` + marked.parse(data.response);
+
+            box.appendChild(userDiv);
+            box.appendChild(botDiv);
+
+            box.scrollTop = box.scrollHeight;
+            input.value = "";
+        })
+        .catch(err => {
+            alert("Something went wrong. Check console.");
+            console.error(err);
+        });
+    }
+</script>
+
+</body>
+</html>
